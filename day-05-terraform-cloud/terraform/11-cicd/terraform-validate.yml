@@ -1,0 +1,26 @@
+# Example workflow. Copy to .github/workflows/terraform-validate.yml
+name: Terraform validation
+on:
+  pull_request:
+    paths:
+      - 'day-05-terraform-cloud/terraform/**'
+  workflow_dispatch:
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        directory:
+          - day-05-terraform-cloud/terraform/01-fundamentals
+          - day-05-terraform-cloud/terraform/02-hcl-language
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-terraform@v3
+      - run: terraform fmt -check
+        working-directory: ${{ matrix.directory }}
+      - run: terraform init -backend=false
+        working-directory: ${{ matrix.directory }}
+      - run: terraform validate
+        working-directory: ${{ matrix.directory }}
